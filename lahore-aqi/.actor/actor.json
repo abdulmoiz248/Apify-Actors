@@ -10,8 +10,9 @@
   "dockerfile": "./Dockerfile",
   "readme": "./README.md",
   "input": "./input_schema.json",
-  "storages": {
-    "dataset": "./output_schema.json"
+  "output": {
+    "dataset": "./dataset_schema.json",
+    "keyValueStore": "./output_schema.json"
   },
   "environmentVariables": {
     "CRAWLEE_HEADLESS": "1",
