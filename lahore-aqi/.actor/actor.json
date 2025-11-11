@@ -11,6 +11,7 @@
   "readme": "./README.md",
   "input": "./input_schema.json",
   "output": {
+    "actorOutputSchemaVersion": 1,
     "dataset": "./dataset_schema.json",
     "keyValueStore": "./output_schema.json"
   },
