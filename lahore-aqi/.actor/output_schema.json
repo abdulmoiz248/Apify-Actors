@@ -1,20 +1,12 @@
 {
-  "actorSpecification": 1,
-  "name": "pakistan-city-aqi-30days",
-  "title": "Pakistan City AQI 30 Days Scraper",
-  "version": "1.0.0",
-  "description": "Scrapes the past N days of AQI for a city in Pakistan from IQAir or fallback source.",
-  "minMemoryMbytes": 256,
-  "maxMemoryMbytes": 4096,
-  "dockerfile": "./Dockerfile",
-  "readme": "./README.md",
-  "input": "./input_schema.json",
-  "output": {
-    "actorOutputSchemaVersion": 1,
-    "title": "Pakistan City AQI output schema",
-    "description": "Schema for the dataset items produced by the AQI actor.",
-    "type": "object",
-    "properties": {
+    "actorSpecification": 1,
+    "name": "files-scraper",
+    "title": "Files scraper",
+    "version": "1.0.0",
+    "output": {
+        "actorOutputSchemaVersion": 1,
+        "title": "Output schema of the files scraper",
+        "properties":{
       "fetchedAt": { "type": "string", "format": "date-time" },
       "input": { "type": "object" },
       "sourceUrl": { "type": "string", "format": "uri" },
@@ -35,11 +27,6 @@
         }
       },
       "debugHtmlSnippet": { "type": ["string","null"] }
-    },
-    "required": ["fetchedAt","input","sourceUrl","city","results"]
-  },
-  "environmentVariables": {
-    "CRAWLEE_HEADLESS": "1",
-    "CRAWLEE_STORAGE_DIR": "./storage"
-  }
+    }
+    }
 }
