@@ -1,0 +1,20 @@
+{
+  "actorSpecification": 1,
+  "name": "pakistan-city-aqi-30days",
+  "version": "1.0.0",
+  "buildTag": "latest",
+  "title": "Pakistan City AQI 30 Days Scraper",
+  "description": "Scrapes the past N days of AQI for a city in Pakistan from IQAir.",
+  "minMemoryMbytes": 256,
+  "maxMemoryMbytes": 4096,
+  "dockerfile": "./Dockerfile",
+  "readme": "./README.md",
+  "input": "./INPUT_SCHEMA.json",
+  "storages": {
+    "dataset": "./OUTPUT_SCHEMA.json"
+  },
+  "environmentVariables": {
+    "CRAWLEE_HEADLESS": "1",
+    "CRAWLEE_STORAGE_DIR": "./storage"
+  }
+}

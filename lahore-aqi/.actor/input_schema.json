@@ -1,0 +1,38 @@
+{
+  "title": "Pakistan city AQI input schema",
+  "description": "Provide a Pakistani city to fetch the AQI for the past days.",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "city": {
+      "title": "City name",
+      "type": "string",
+      "description": "Name of a city in Pakistan (e.g. Lahore, Karachi).",
+      "editor": "textfield"
+    },
+    "province": {
+      "title": "Province slug (optional)",
+      "type": "string",
+      "description": "Optional province, e.g. punjab, sindh.",
+      "editor": "textfield"
+    },
+    "days": {
+      "title": "Number of days",
+      "type": "integer",
+      "description": "Number of days of AQI history to fetch (1–90).",
+      "minimum": 1,
+      "maximum": 90,
+      "default": 30,
+      "editor": "number"
+    },
+    "debug": {
+      "title": "Enable debug mode",
+      "type": "boolean",
+      "description": "Include extra debug info (HTML snippet).",
+      "default": false,
+      "editor": "checkbox"
+    }
+  },
+  "required": ["city"],
+  "additionalProperties": false
+}

@@ -1,0 +1,29 @@
+{
+  "title": "Pakistan city AQI output schema",
+  "description": "Schema for the dataset items produced by the AQI actor.",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "fetchedAt": { "type": "string", "format": "date-time" },
+    "input": { "type": "object" },
+    "sourceUrl": { "type": "string", "format": "uri" },
+    "city": { "type": "string" },
+    "province": { "type": ["string","null"] },
+    "daysRequested": { "type": "integer" },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "aqi": { "anyOf": [ { "type": "integer" }, { "type": "null" } ] },
+          "pm25": { "anyOf": [ { "type": "number" }, { "type": "null" } ] },
+          "note": { "type": ["string","null"] }
+        },
+        "required": ["date","aqi"]
+      }
+    },
+    "debugHtmlSnippet": { "type": ["string","null"] }
+  },
+  "required": ["fetchedAt","input","sourceUrl","city","results"]
+}
