@@ -10,11 +10,7 @@
   "dockerfile": "./Dockerfile",
   "readme": "./README.md",
   "input": "./input_schema.json",
-  "output": {
-    "actorOutputSchemaVersion": 1,
-    "dataset": "./dataset_schema.json",
-    "keyValueStore": "./output_schema.json"
-  },
+  "output": "./dataset_schema.json",
   "environmentVariables": {
     "CRAWLEE_HEADLESS": "1",
     "CRAWLEE_STORAGE_DIR": "./storage"
