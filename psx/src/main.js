@@ -1,7 +1,7 @@
 // Apify SDK - toolkit for building Apify Actors (Read more at https://docs.apify.com/sdk/js/)
 import { Actor } from 'apify';
 // Crawlee - web scraping and browser automation library (Read more at https://crawlee.dev)
-import { CheerioCrawler } from 'crawlee';
+import { PuppeteerCrawler } from 'crawlee';
 
 // Helper function to clean and parse text
 const cleanText = (text) => text?.trim().replace(/\s+/g, ' ') || '';
@@ -26,11 +26,12 @@ const parseCompanyProfile = ($) => {
     const profile = {};
     
     // Business description
-    profile.businessDescription = cleanText($('h4:contains("BUSINESS DESCRIPTION")').next('p').text());
+    const bizDesc = $('.profile__item--decription p').text();
+    profile.businessDescription = cleanText(bizDesc);
     
     // Key people
     const keyPeople = [];
-    $('h4:contains("KEY PEOPLE")').parent().find('table tr').each((_, row) => {
+    $('.profile__item--people table tbody tr').each((_, row) => {
         const cells = $(row).find('td');
         if (cells.length >= 2) {
             keyPeople.push({
@@ -42,20 +43,35 @@ const parseCompanyProfile = ($) => {
     profile.keyPeople = keyPeople;
     
     // Address
-    profile.address = cleanText($('h4:contains("ADDRESS")').next('p').text());
+    const addressItem = $('.profile__item').filter((i, el) => {
+        return $(el).find('.item__head').text().includes('ADDRESS');
+    });
+    profile.address = cleanText(addressItem.find('p').first().text());
     
     // Website
-    const websiteLink = $('h4:contains("WEBSITE")').next('p').find('a');
+    const websiteItem = $('.profile__item').filter((i, el) => {
+        return $(el).find('.item__head').text().includes('WEBSITE');
+    });
+    const websiteLink = websiteItem.find('a');
     profile.website = websiteLink.attr('href') || cleanText(websiteLink.text());
     
     // Registrar
-    profile.registrar = cleanText($('h4:contains("REGISTRAR")').next('p').text());
+    const registrarItem = $('.profile__item').filter((i, el) => {
+        return $(el).find('.item__head').text().includes('REGISTRAR');
+    });
+    profile.registrar = cleanText(registrarItem.find('p').text());
     
     // Auditor
-    profile.auditor = cleanText($('h4:contains("AUDITOR")').next('p').text());
+    const auditorItem = $('.profile__item').filter((i, el) => {
+        return $(el).find('.item__head').text().includes('AUDITOR');
+    });
+    profile.auditor = cleanText(auditorItem.find('p').first().text());
     
     // Fiscal Year End
-    profile.fiscalYearEnd = cleanText($('h4:contains("Fiscal Year End")').next('p').text());
+    const fiscalItem = $('.profile__item').filter((i, el) => {
+        return $(el).find('.item__head').text().includes('Fiscal Year End');
+    });
+    profile.fiscalYearEnd = cleanText(fiscalItem.find('p').last().text());
     
     return profile;
 };
@@ -64,24 +80,20 @@ const parseCompanyProfile = ($) => {
 const parseEquityProfile = ($) => {
     const equity = {};
     
-    $('h3:contains("Equity Profile")').parent().find('p').each((_, p) => {
-        const text = $(p).text();
+    $('.companyEquity .stats_item').each((_, item) => {
+        const label = cleanText($(item).find('.stats_label').text()).toLowerCase();
+        const value = cleanText($(item).find('.stats_value').text());
         
-        if (text.includes('MARKET CAP')) {
-            const parts = text.split(/\s+/);
-            equity.marketCap = parts.find(p => p.includes(',') && p.replace(/,/g, '').match(/^\d+(\.\d+)?$/));
-        }
-        if (text.includes('SHARES')) {
-            const match = text.match(/SHARES\s+([\d,]+)/);
-            equity.totalShares = match ? match[1] : null;
-        }
-        if (text.includes('FREE FLOAT') && !equity.freeFloat) {
-            const match = text.match(/FREE FLOAT\s+([\d,]+)/);
-            equity.freeFloat = match ? match[1] : null;
-        }
-        if (text.includes('FREE FLOAT') && text.includes('%')) {
-            const match = text.match(/([\d.]+)%/);
-            equity.freeFloatPercentage = match ? match[1] + '%' : null;
+        if (label.includes('market cap')) {
+            equity.marketCap = value;
+        } else if (label === 'shares') {
+            equity.totalShares = value;
+        } else if (label === 'free float' && !equity.freeFloat) {
+            equity.freeFloat = value;
+        } else if (label === 'free float' && !value.includes('%') && !equity.freeFloatPercentage) {
+            equity.freeFloat = value;
+        } else if (label === 'free float' && value.includes('%')) {
+            equity.freeFloatPercentage = value;
         }
     });
     
@@ -92,21 +104,15 @@ const parseEquityProfile = ($) => {
 const parseMarketData = ($) => {
     const marketData = {};
     
-    // Current price and change
-    const priceText = cleanText($('.stock-price, .price').first().text());
-    marketData.lastPrice = priceText;
-    
-    // Parse various market metrics
-    const metrics = [
-        'OPEN', 'HIGH', 'LOW', 'VOLUME', 'LDCP', 'VAR', 
-        'ASK PRICE', 'BID PRICE', 'P/E RATIO', 'HAIRCUT'
-    ];
-    
-    metrics.forEach(metric => {
-        const element = $(`b:contains("${metric}")`).parent();
-        if (element.length) {
-            const value = cleanText(element.text().replace(metric, ''));
-            marketData[metric.toLowerCase().replace(/\s+/g, '_')] = value;
+    // Parse all stats items from the quote stats section
+    $('.quote__stats .stats_item').each((_, item) => {
+        const label = cleanText($(item).find('.stats_label').text()).toLowerCase();
+        const value = cleanText($(item).find('.stats_value').text());
+        
+        if (value) {
+            // Convert label to key (e.g., "P/E Ratio (TTM)" -> "pe_ratio")
+            const key = label.replace(/[^\w\s]/g, '').replace(/\s+/g, '_');
+            marketData[key] = value;
         }
     });
     
@@ -120,11 +126,44 @@ const parseFinancials = ($) => {
         quarterly: []
     };
     
-    const financialSection = $('h3:contains("Financials")').parent();
-    const tables = financialSection.find('table');
+    // Parse Annual data
+    const annualTable = $('#financialTab .tabs__panel[data-name="Annual"] table');
+    if (annualTable.length) {
+        const headers = [];
+        annualTable.find('thead tr th').each((_, th) => {
+            headers.push(cleanText($(th).text()));
+        });
+        
+        annualTable.find('tbody tr').each((_, row) => {
+            const rowData = {};
+            $(row).find('td').each((i, td) => {
+                const header = headers[i] || `col${i}`;
+                rowData[header] = cleanText($(td).text());
+            });
+            if (Object.keys(rowData).length > 0) {
+                financials.annual.push(rowData);
+            }
+        });
+    }
     
-    if (tables.length > 0) {
-        financials.data = parseTable($, tables.first());
+    // Parse Quarterly data
+    const quarterlyTable = $('#financialTab .tabs__panel[data-name="Quarterly"] table');
+    if (quarterlyTable.length) {
+        const headers = [];
+        quarterlyTable.find('thead tr th').each((_, th) => {
+            headers.push(cleanText($(th).text()));
+        });
+        
+        quarterlyTable.find('tbody tr').each((_, row) => {
+            const rowData = {};
+            $(row).find('td').each((i, td) => {
+                const header = headers[i] || `col${i}`;
+                rowData[header] = cleanText($(td).text());
+            });
+            if (Object.keys(rowData).length > 0) {
+                financials.quarterly.push(rowData);
+            }
+        });
     }
     
     return financials;
@@ -132,27 +171,44 @@ const parseFinancials = ($) => {
 
 // Parse ratios
 const parseRatios = ($) => {
-    const ratiosSection = $('h3:contains("Ratios")').parent();
-    const tables = ratiosSection.find('table');
+    const ratios = [];
     
-    if (tables.length > 0) {
-        return parseTable($, tables.first());
+    const ratiosTable = $('#ratios table, .company__ratios table');
+    if (ratiosTable.length) {
+        const headers = [];
+        ratiosTable.find('thead tr th').each((_, th) => {
+            headers.push(cleanText($(th).text()));
+        });
+        
+        ratiosTable.find('tbody tr').each((_, row) => {
+            const rowData = {};
+            $(row).find('td').each((i, td) => {
+                const header = headers[i] || `col${i}`;
+                rowData[header] = cleanText($(td).text());
+            });
+            if (Object.keys(rowData).length > 0) {
+                ratios.push(rowData);
+            }
+        });
     }
     
-    return [];
+    return ratios;
 };
 
 // Parse announcements
 const parseAnnouncements = ($) => {
     const announcements = [];
     
-    $('h3:contains("Announcements")').parent().find('table tr').each((_, row) => {
+    $('#announcementsTab .tabs__panel--selected table tbody tr').each((_, row) => {
         const cells = $(row).find('td');
         if (cells.length >= 2) {
+            const links = $(cells[2]).find('a');
+            const pdfLink = links.filter((i, a) => $(a).text().includes('PDF')).attr('href');
+            
             announcements.push({
                 date: cleanText($(cells[0]).text()),
-                description: cleanText($(cells[1]).text()),
-                link: $(cells[2]).find('a').attr('href') || null
+                title: cleanText($(cells[1]).text()),
+                pdfLink: pdfLink ? `https://dps.psx.com.pk${pdfLink}` : null
             });
         }
     });
@@ -164,12 +220,12 @@ const parseAnnouncements = ($) => {
 const parsePayouts = ($) => {
     const payouts = [];
     
-    $('h3:contains("Payouts")').parent().find('table tr').each((_, row) => {
+    $('#payouts table tbody tr, .company__payouts table tbody tr').each((_, row) => {
         const cells = $(row).find('td');
         if (cells.length >= 3) {
             payouts.push({
                 announcementDate: cleanText($(cells[0]).text()),
-                period: cleanText($(cells[1]).text()),
+                financialPeriod: cleanText($(cells[1]).text()),
                 dividend: cleanText($(cells[2]).text()),
                 bookClosurePeriod: cleanText($(cells[3]).text())
             });
@@ -200,18 +256,30 @@ await Actor.main(async () => {
     // Setup proxy configuration
     const proxyConfig = await Actor.createProxyConfiguration(proxyConfiguration);
 
-    // Create the crawler
-    const crawler = new CheerioCrawler({
+    // Create the crawler with Puppeteer for JavaScript rendering
+    const crawler = new PuppeteerCrawler({
         proxyConfiguration: proxyConfig,
         maxRequestRetries,
         requestHandlerTimeoutSecs: 60,
         
-        async requestHandler({ request, $, log }) {
+        async requestHandler({ request, page, log }) {
             const { symbol } = request.userData;
             
             log.info(`Scraping data for ${symbol}`, { url: request.url });
             
             try {
+                // Wait for the main content to load
+                await page.waitForSelector('.item__head', { timeout: 15000 });
+                
+                // Wait a bit more for dynamic content using setTimeout
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Get page content after JavaScript has rendered
+                const content = await page.content();
+                
+                // Use Cheerio to parse the rendered HTML
+                const { load } = await import('cheerio');
+                const $ = load(content);
                 // Extract all data
                 const companyProfile = parseCompanyProfile($);
                 const equityProfile = parseEquityProfile($);
