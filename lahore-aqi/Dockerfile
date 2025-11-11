@@ -27,7 +27,10 @@ RUN npm --quiet set progress=false \
 # We switch to root to allow installing system dependencies when using --with-deps,
 # then switch back to the non-root user `myuser` used by the base image.
 USER root
-RUN npx playwright install --with-deps
+# Install only the Chromium browser binary (avoids running apt-get in images without apt).
+# If runtime fails due to missing system libraries, switch to a Debian-based base image
+# and use `npx playwright install --with-deps` instead.
+RUN npx playwright install chromium
 USER myuser
 
 # Next, copy the remaining files and directories with the source code.
