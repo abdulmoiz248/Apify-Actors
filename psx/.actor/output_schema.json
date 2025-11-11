@@ -15,47 +15,53 @@
             "description": "PSX company profile page URL",
             "template": "{{url}}"
         },
-        "companyProfile": {
-            "type": "object",
-            "title": "Company Profile",
-            "description": "Company overview and key information",
-            "template": "{{companyProfile}}"
+        "businessDescription": {
+            "type": "string",
+            "title": "Business Description",
+            "description": "Company business overview",
+            "template": "{{companyProfile.businessDescription}}"
         },
-        "equityProfile": {
-            "type": "object",
-            "title": "Equity Profile",
-            "description": "Share and market capitalization data",
-            "template": "{{equityProfile}}"
+        "address": {
+            "type": "string",
+            "title": "Address",
+            "description": "Company registered address",
+            "template": "{{companyProfile.address}}"
         },
-        "marketData": {
-            "type": "object",
-            "title": "Market Data",
-            "description": "Real-time trading statistics",
-            "template": "{{marketData}}"
+        "website": {
+            "type": "string",
+            "title": "Website",
+            "description": "Company website URL",
+            "template": "{{companyProfile.website}}"
         },
-        "financials": {
-            "type": "object",
-            "title": "Financial Data",
-            "description": "Annual and quarterly financial statements",
-            "template": "{{financials}}"
+        "marketCap": {
+            "type": "string",
+            "title": "Market Capitalization",
+            "description": "Total market capitalization",
+            "template": "{{equityProfile.marketCap}}"
         },
-        "ratios": {
-            "type": "array",
-            "title": "Financial Ratios",
-            "description": "Key financial ratios and metrics",
-            "template": "{{ratios}}"
+        "totalShares": {
+            "type": "string",
+            "title": "Total Shares",
+            "description": "Total number of shares",
+            "template": "{{equityProfile.totalShares}}"
         },
-        "announcements": {
-            "type": "array",
-            "title": "Company Announcements",
-            "description": "Recent company announcements and disclosures",
-            "template": "{{announcements}}"
+        "close": {
+            "type": "string",
+            "title": "Close Price",
+            "description": "Last closing price",
+            "template": "{{marketData.close}}"
         },
-        "payouts": {
-            "type": "array",
-            "title": "Dividend Payouts",
-            "description": "Historical dividend payout information",
-            "template": "{{payouts}}"
+        "volume": {
+            "type": "string",
+            "title": "Volume",
+            "description": "Trading volume",
+            "template": "{{marketData.volume}}"
+        },
+        "peRatio": {
+            "type": "string",
+            "title": "P/E Ratio",
+            "description": "Price to Earnings Ratio (TTM)",
+            "template": "{{marketData.pe_ratio_ttm_}}"
         }
     }
 }
