@@ -9,9 +9,9 @@
   "maxMemoryMbytes": 4096,
   "dockerfile": "./Dockerfile",
   "readme": "./README.md",
-  "input": "./INPUT_SCHEMA.json",
+  "input": "./input_schema.json",
   "storages": {
-    "dataset": "./OUTPUT_SCHEMA.json"
+    "dataset": "./output_schema.json"
   },
   "environmentVariables": {
     "CRAWLEE_HEADLESS": "1",
