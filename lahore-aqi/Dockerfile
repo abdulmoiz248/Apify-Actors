@@ -1,7 +1,7 @@
 # Specify the base Docker image. You can read more about
 # the available images at https://docs.apify.com/sdk/js/docs/guides/docker-images
 # You can also use any other image from Docker Hub.
-FROM apify/actor-node-playwright:22-chromium
+FROM apify/actor-node:22
 
 # Check preinstalled packages
 RUN npm ls crawlee apify puppeteer playwright
@@ -22,6 +22,13 @@ RUN npm --quiet set progress=false \
     && echo "NPM version:" \
     && npm --version \
     && rm -r ~/.npm
+
+# Install Playwright browsers (downloads browser binaries and required OS deps).
+# We switch to root to allow installing system dependencies when using --with-deps,
+# then switch back to the non-root user `myuser` used by the base image.
+USER root
+RUN npx playwright install --with-deps
+USER myuser
 
 # Next, copy the remaining files and directories with the source code.
 # Since we do this after NPM install, quick build will be really fast
