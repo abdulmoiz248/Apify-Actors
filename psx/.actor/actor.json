@@ -1,0 +1,13 @@
+{
+	"actorSpecification": 1,
+	"name": "psx",
+	"title": "Project Cheerio Crawler Javascript for scraping stocks price",
+	"description": "Crawlee and Cheerio project in javascript.",
+	"version": "0.0",
+	"input": "./input_schema.json",
+	"output": "./output_schema.json",
+	"storages": {
+		"dataset": "./dataset_schema.json"
+	},
+	"dockerfile": "../Dockerfile"
+}
