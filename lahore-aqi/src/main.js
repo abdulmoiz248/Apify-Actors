@@ -1,4 +1,4 @@
-import { CheerioCrawler, Dataset, log } from 'crawlee';
+import { CheerioCrawler, Dataset, log, ProxyConfiguration } from 'crawlee';
 import { Actor } from 'apify';
 
 const defaultInput = {
@@ -78,9 +78,31 @@ if (input.province) {
     candidateUrls.push(`https://www.aqi.in/dashboard/pakistan/${slugify(input.province)}/${slugify(input.city)}`);
 }
 
+// Configure proxy usage (Apify Proxy) and default request headers to reduce 403s.
+// You can opt-out by setting input.useApifyProxy = false in actor input.
+const useProxy = input.useApifyProxy !== undefined ? input.useApifyProxy : true;
+let proxyConfiguration = undefined;
+if (useProxy) {
+    const proxyCreateOptions = {};
+    if (input.apifyProxyGroups) {
+        proxyCreateOptions.apifyProxyGroups = Array.isArray(input.apifyProxyGroups)
+            ? input.apifyProxyGroups
+            : String(input.apifyProxyGroups).split(',').map((s) => s.trim());
+    }
+    if (input.apifyProxyCountry) proxyCreateOptions.apifyProxyCountry = input.apifyProxyCountry;
+    proxyConfiguration = await ProxyConfiguration.create(proxyCreateOptions);
+}
+
 const crawler = new CheerioCrawler({
+    proxyConfiguration,
     requestHandlerTimeoutSecs: 90,
     maxRequestRetries: 1,
+    // Basic request options: set a common desktop User-Agent to reduce blocking.
+    requestOptions: {
+        headers: {
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+    },
     async requestHandler({ request, $, log }) {
         // $ is the Cheerio root for the page HTML
         const { results, foundAny, debugHtml } = parseAqiWithCheerio($, input.days);
