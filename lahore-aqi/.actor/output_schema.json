@@ -2,6 +2,7 @@
   "title": "Pakistan city AQI output schema",
   "description": "Schema for the dataset items produced by the AQI actor.",
   "type": "object",
+  
   "actorOutputSchemaVersion": 1,
   "properties": {
     "fetchedAt": { "type": "string", "format": "date-time" },
