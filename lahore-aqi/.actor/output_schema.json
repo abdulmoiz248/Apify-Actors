@@ -1,28 +1,11 @@
 {
     "actorOutputSchemaVersion": 1,
-    "name": "files-scraper",
-    "title": "Files scraper",
-    "version": "1.0.0",
+    "title": "Output schema of the files scraper",
     "properties": {
-        "fetchedAt": { "type": "string", "format": "date-time" },
-        "input": { "type": "object" },
-        "sourceUrl": { "type": "string", "format": "uri" },
-        "city": { "type": "string" },
-        "province": { "type": ["string", "null"] },
-        "daysRequested": { "type": "integer" },
-        "results": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "date": { "type": "string", "format": "date" },
-                    "aqi": { "anyOf": [ { "type": "integer" }, { "type": "null" } ] },
-                    "pm25": { "anyOf": [ { "type": "number" }, { "type": "null" } ] },
-                    "note": { "type": ["string", "null"] }
-                },
-                "required": ["date", "aqi"]
-            }
-        },
-        "debugHtmlSnippet": { "type": ["string", "null"] }
+        "overview": {
+            "type": "string",
+            "title": "Overview",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=overview"
+        }
     }
 }
