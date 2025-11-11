@@ -4,7 +4,7 @@
     "title": "Files scraper",
     "version": "1.0.0",
     "output": {
-       
+       "actorOutputSchemaVersion": 1,
         "title": "Output schema of the files scraper",
         "properties":{
       "fetchedAt": { "type": "string", "format": "date-time" },
