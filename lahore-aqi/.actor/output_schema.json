@@ -3,7 +3,7 @@
     "name": "files-scraper",
     "title": "Files scraper",
     "version": "1.0.0",
-    "output": {
+    "properties": {
        "actorOutputSchemaVersion": 1,
         "title": "Output schema of the files scraper",
         "properties":{
