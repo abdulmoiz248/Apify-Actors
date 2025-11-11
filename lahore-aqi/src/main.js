@@ -98,12 +98,6 @@ const crawler = new CheerioCrawler({
     proxyConfiguration,
     requestHandlerTimeoutSecs: 90,
     maxRequestRetries: 1,
-    // Basic request options: set a common desktop User-Agent to reduce blocking.
-    requestOptions: {
-        headers: {
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        }
-    },
     async requestHandler({ request, $, log }) {
         // $ is the Cheerio root for the page HTML
         const { results, foundAny, debugHtml } = parseAqiWithCheerio($, input.days);
