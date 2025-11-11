@@ -1,4 +1,4 @@
-import { CheerioCrawler, Dataset, log, ProxyConfiguration } from 'crawlee';
+import { CheerioCrawler, Dataset, log } from 'crawlee';
 import { Actor } from 'apify';
 
 const defaultInput = {
@@ -90,7 +90,8 @@ if (useProxy) {
             : String(input.apifyProxyGroups).split(',').map((s) => s.trim());
     }
     if (input.apifyProxyCountry) proxyCreateOptions.apifyProxyCountry = input.apifyProxyCountry;
-    proxyConfiguration = await ProxyConfiguration.create(proxyCreateOptions);
+    // Use Actor helper to create proxy configuration (works with Apify platform)
+    proxyConfiguration = await Actor.createProxyConfiguration(proxyCreateOptions);
 }
 
 const crawler = new CheerioCrawler({
