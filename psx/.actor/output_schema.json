@@ -1,190 +1,61 @@
 {
     "actorOutputSchemaVersion": 1,
-    "title": "PSX Company Data Output",
+    "title": "PSX Company Data",
     "description": "Scraped data from Pakistan Stock Exchange company pages",
     "properties": {
         "symbol": {
             "type": "string",
             "title": "Stock Symbol",
-            "description": "Company stock symbol on PSX"
+            "description": "Company stock symbol on PSX",
+            "template": "{{symbol}}"
         },
         "url": {
             "type": "string",
             "title": "Company URL",
-            "description": "PSX company profile page URL"
-        },
-        "scrapedAt": {
-            "type": "string",
-            "title": "Scraped At",
-            "description": "Timestamp when data was scraped"
+            "description": "PSX company profile page URL",
+            "template": "{{url}}"
         },
         "companyProfile": {
             "type": "object",
             "title": "Company Profile",
             "description": "Company overview and key information",
-            "properties": {
-                "businessDescription": {
-                    "type": "string",
-                    "title": "Business Description"
-                },
-                "keyPeople": {
-                    "type": "array",
-                    "title": "Key People",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            },
-                            "position": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                },
-                "address": {
-                    "type": "string",
-                    "title": "Address"
-                },
-                "website": {
-                    "type": "string",
-                    "title": "Website"
-                },
-                "registrar": {
-                    "type": "string",
-                    "title": "Share Registrar"
-                },
-                "auditor": {
-                    "type": "string",
-                    "title": "Auditor"
-                },
-                "fiscalYearEnd": {
-                    "type": "string",
-                    "title": "Fiscal Year End"
-                }
-            }
+            "template": "{{companyProfile}}"
         },
         "equityProfile": {
             "type": "object",
             "title": "Equity Profile",
             "description": "Share and market capitalization data",
-            "properties": {
-                "marketCap": {
-                    "type": "string",
-                    "title": "Market Capitalization"
-                },
-                "totalShares": {
-                    "type": "string",
-                    "title": "Total Shares"
-                },
-                "freeFloat": {
-                    "type": "string",
-                    "title": "Free Float Shares"
-                },
-                "freeFloatPercentage": {
-                    "type": "string",
-                    "title": "Free Float Percentage"
-                }
-            }
+            "template": "{{equityProfile}}"
         },
         "marketData": {
             "type": "object",
             "title": "Market Data",
             "description": "Real-time trading statistics",
-            "properties": {
-                "open": {
-                    "type": "string",
-                    "title": "Open Price"
-                },
-                "high": {
-                    "type": "string",
-                    "title": "High Price"
-                },
-                "low": {
-                    "type": "string",
-                    "title": "Low Price"
-                },
-                "close": {
-                    "type": "string",
-                    "title": "Close Price"
-                },
-                "volume": {
-                    "type": "string",
-                    "title": "Volume"
-                },
-                "pe_ratio_ttm_": {
-                    "type": "string",
-                    "title": "P/E Ratio (TTM)"
-                }
-            }
+            "template": "{{marketData}}"
         },
         "financials": {
             "type": "object",
             "title": "Financial Data",
             "description": "Annual and quarterly financial statements",
-            "properties": {
-                "annual": {
-                    "type": "array",
-                    "title": "Annual Financials"
-                },
-                "quarterly": {
-                    "type": "array",
-                    "title": "Quarterly Financials"
-                }
-            }
+            "template": "{{financials}}"
         },
         "ratios": {
             "type": "array",
             "title": "Financial Ratios",
-            "description": "Key financial ratios and metrics"
+            "description": "Key financial ratios and metrics",
+            "template": "{{ratios}}"
         },
         "announcements": {
             "type": "array",
             "title": "Company Announcements",
             "description": "Recent company announcements and disclosures",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "date": {
-                        "type": "string",
-                        "title": "Announcement Date"
-                    },
-                    "title": {
-                        "type": "string",
-                        "title": "Title"
-                    },
-                    "pdfLink": {
-                        "type": "string",
-                        "title": "PDF Link"
-                    }
-                }
-            }
+            "template": "{{announcements}}"
         },
         "payouts": {
             "type": "array",
             "title": "Dividend Payouts",
             "description": "Historical dividend payout information",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "announcementDate": {
-                        "type": "string",
-                        "title": "Announcement Date"
-                    },
-                    "financialPeriod": {
-                        "type": "string",
-                        "title": "Financial Period"
-                    },
-                    "dividend": {
-                        "type": "string",
-                        "title": "Dividend"
-                    },
-                    "bookClosurePeriod": {
-                        "type": "string",
-                        "title": "Book Closure Period"
-                    }
-                }
-            }
+            "template": "{{payouts}}"
         }
     }
 }
