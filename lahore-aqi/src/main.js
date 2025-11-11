@@ -1,4 +1,4 @@
-import { PlaywrightCrawler, Dataset, log } from 'crawlee';
+import { CheerioCrawler, Dataset, log } from 'crawlee';
 import { Actor } from 'apify';
 
 const defaultInput = {
@@ -29,15 +29,19 @@ function getLastNDates(n) {
     return out;
 }
 
-// Parser for AQI.in historical table
-async function parseAqiInPage(page, days) {
-    const html = await page.content();
+// Parser for AQI.in historical table using Cheerio ($)
+function parseAqiWithCheerio($, days) {
+    const html = $.html();
     const results = [];
     const dates = getLastNDates(days);
     for (const date of dates) results.push({ date, aqi: null, pm25: null, note: 'not found yet' });
 
     // Find table rows containing date and AQI
-    const rows = await page.$$eval('table tr', trs => trs.map(tr => tr.innerText));
+    const rows = [];
+    $('table tr').each((i, el) => {
+        rows.push($(el).text());
+    });
+
     for (const row of rows) {
         for (let i = 0; i < dates.length; i++) {
             const d = dates[i];
@@ -52,7 +56,7 @@ async function parseAqiInPage(page, days) {
     }
 
     const foundAny = results.some(r => r.aqi !== null);
-    return { results, foundAny, debugHtml: html.slice(0,16000) };
+    return { results, foundAny, debugHtml: html.slice(0, 16000) };
 }
 
 await Actor.init();
@@ -74,14 +78,12 @@ if (input.province) {
     candidateUrls.push(`https://www.aqi.in/dashboard/pakistan/${slugify(input.province)}/${slugify(input.city)}`);
 }
 
-const crawler = new PlaywrightCrawler({
-    launchContext: { launchOptions: { headless: process.env.CRAWLEE_HEADLESS !== '0' } },
+const crawler = new CheerioCrawler({
     requestHandlerTimeoutSecs: 90,
     maxRequestRetries: 1,
-    navigationTimeoutSecs: 60,
-    async requestHandler({ request, page, log }) {
-        await page.waitForLoadState('networkidle').catch(()=>{});
-        const { results, foundAny, debugHtml } = await parseAqiInPage(page, input.days);
+    async requestHandler({ request, $, log }) {
+        // $ is the Cheerio root for the page HTML
+        const { results, foundAny, debugHtml } = parseAqiWithCheerio($, input.days);
 
         const item = {
             fetchedAt: new Date().toISOString(),

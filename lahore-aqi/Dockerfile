@@ -23,19 +23,6 @@ RUN npm --quiet set progress=false \
     && npm --version \
     && rm -r ~/.npm
 
-# Install Playwright browsers (downloads browser binaries and required OS deps).
-# We switch to root to allow installing system dependencies when using --with-deps,
-# then switch back to the non-root user `myuser` used by the base image.
-USER root
-# Install Chromium browser binary into a shared path so the non-root `myuser`
-# process can access it at runtime. We set PLAYWRIGHT_BROWSERS_PATH to avoid
-# per-user caches and then chown the directory to `myuser`.
-ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
-RUN mkdir -p /ms-playwright \
-    && npx playwright install chromium \
-    && chown -R myuser:myuser /ms-playwright
-USER myuser
-
 # Next, copy the remaining files and directories with the source code.
 # Since we do this after NPM install, quick build will be really fast
 # for most source file changes.
